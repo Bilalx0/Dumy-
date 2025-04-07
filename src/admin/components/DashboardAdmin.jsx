@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import Dashboard from "../components/Dashboard";
+import Sidebar from "../../components/Sidebar";
+import Dashboard from "./Dashboard";
 
 const DashboardAdmin = () => {
   const [viewType, setViewType] = useState("mansions"); // Default to Mansions

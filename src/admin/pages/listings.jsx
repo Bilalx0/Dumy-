@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { FaBed, FaBath } from "react-icons/fa";
 import { BsFullscreen } from "react-icons/bs";
 import { AiOutlineHeart } from "react-icons/ai";
-import img1 from "../assests/BrandedResi-P.jpg";
-import sharelogo from "../assests/Share Icon_1.svg";
+import img1 from "../../assests/BrandedResi-P.jpg";
+import sharelogo from "../../assests/Share Icon_1.svg";
 import {
   FaFacebook,
   FaInstagram,

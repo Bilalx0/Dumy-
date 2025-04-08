@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import logo from "../assests/TMM-LANDING PAGE 1.svg";
+import logo from "../../assests/TMM-LANDING PAGE 1.svg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";

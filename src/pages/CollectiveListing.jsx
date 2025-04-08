@@ -15,7 +15,7 @@ import { FaXTwitter } from "react-icons/fa6"; // Impor
 import newImage3 from "../assests/Mansions.jpg"; // Add more images as needed
 import { FaPhoneAlt } from "react-icons/fa"; // Importing WhatsApp and phone icons
 import { BsFlag } from "react-icons/bs";
-import Listing from "../components/listings";
+import Listing from "../admin/pages/listings";
 import Footer from "../components/Footer";
 import logo from "../assests/TMM-LANDING PAGE 1.svg";
 import ImageGallerys from "../components/ImageGallerys";

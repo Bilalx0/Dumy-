@@ -1,12 +1,12 @@
 import React from "react";
-import homelogo from "../assests/Mansions.svg";
-import penthouselogo from "../assests/Penthouse.svg";
-import magazinelogo from "../assests/Magazine.svg";
-import newletterlogo from "../assests/Newsletters.svg";
-import collectible from "../assests/Collectible.svg";
-import trafic from "../assests/Traffic.svg";
-import logout from "../assests/Log Out.svg";
-import leadslogo from "../assests/Leads White.svg";
+import homelogo from "../../assests/Mansions.svg";
+import penthouselogo from "../../assests/Penthouse.svg";
+import magazinelogo from "../../assests/Magazine.svg";
+import newletterlogo from "../../assests/Newsletters.svg";
+import collectible from "../../assests/Collectible.svg";
+import trafic from "../../assests/Traffic.svg";
+import logout from "../../assests/Log Out.svg";
+import leadslogo from "../../assests/Leads White.svg";
 import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ setViewType }) => {

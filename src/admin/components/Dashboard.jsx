@@ -8,11 +8,9 @@ import {
   FaArrowDown,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import logo from "../assests/TMM-LANDING PAGE 1.svg";
+import logo from "../../assests/TMM-LANDING PAGE 1.svg"; // apne hisaab sey fix krlo
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
 
 const Dashboard = ({
   viewType,
@@ -21,147 +19,56 @@ const Dashboard = ({
   itemsPerPage = 5,
   onPageChange = () => {},
 }) => {
-  const [posts, setPosts] = useState([]);
-  const [selectedLead, setSelectedLead] = useState(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  // Define state variables
+  const [inquiries, setInquiries] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [sortOrder, setSortOrder] = useState(null); // Sorting order: null, "asc", "desc"
-  const [filterStatus, setFilterStatus] = useState(""); // Filter by Status
-
-  // Sorting logic
-  const sortedPosts = [...posts].sort((a, b) => {
-    if (sortOrder === "asc") {
-      return a.price - b.price; // Ascending Order
-    } else if (sortOrder === "desc") {
-      return b.price - a.price; // Descending Order
-    }
-    return 0; // Default (No sorting)
-  });
-
-  // Filtering logic
-  const filteredPost = sortedPosts.filter((post) => {
-    if (!filterStatus) return true;
-    if (filterStatus === "New") return post.isNew;
-    return filterStatus === "Available" ? post.isAvailable : !post.isAvailable;
-  });
-  useEffect(() => {
-    fetchPosts();
-  }, [viewType]);
-  const navigate = useNavigate();
-
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `https://mansion-back-production.up.railway.app/${viewType}`
-      );
-      setPosts(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-    setLoading(false);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
-    try {
-      await axios.delete(
-        `https://mansion-back-production.up.railway.app/${viewType}/${id}`
-      );
-      setPosts(posts.filter((post) => post._id !== id));
-      alert("Item deleted successfully");
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      alert("Failed to delete item");
-    }
-  };
-
-  const filteredPosts = posts.filter((post) =>
-    post.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(startItem + itemsPerPage - 1, filteredPosts.length);
-  const currentPosts = filteredPosts.slice(startItem - 1, endItem);
-
-  const handleRowClick = (post) => {
-    setSelectedLead(post); // Set the clicked lead to selectedLead
-    setIsFormOpen(true); // Open the form/modal
-  };
-
-  const handleCloseForm = () => {
-    setIsFormOpen(false); // Close the form/modal
-    setSelectedLead(null); // Clear selected lead
-  };
-  const [properties, setProperties] = useState([
-    {
-      id: "01",
-      email: "Cozy Apartment",
-      category: "Newsletter Signup",
-      createdTime: "7pm",
-    },
-    {
-      id: "02",
-      email: "Cozy Apartment",
-      category: "Magazine Signup",
-      createdTime: "7pm",
-    },
-    {
-      id: "03",
-      email: "Cozy Apartment",
-      category: "Magazine Signup",
-      createdTime: "7pm",
-    },
-  ]);
-
-  const [filterCategory, setFilterCategory] = useState("All");
-  const filteredPostss = posts.filter(
-    (post) =>
-      post.name &&
-      post.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (filterCategory === "All" || post.category === filterCategory)
-  );
-
-  const filteredProperties = properties.filter((property) =>
-    property.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
   const [selectedDate, setSelectedDate] = useState(null);
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [sortOrder, setSortOrder] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
 
-  let formPath = "";
+  // Pagination logic
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentPosts = inquiries.slice(startIndex, startIndex + itemsPerPage);
 
-  if (viewType === "mansions") {
-    formPath = "/mansionform";
-  } else if (viewType === "penthouses") {
-    formPath = "/penthouseform";
-  } else if (viewType === "magazine") {
-    formPath = "/magazineform";
-  } else if (viewType === "luxurycollectibles") {
-    formPath = "/collectiblesform";
-  } else if (viewType === "home") {
-    formPath = "/homeform";
-  } else if (viewType === "new-development") {
-    formPath = "/new-developmentform";
-  } else {
-    formPath = "/dashboard"; // Provide a fallback in case of unknown viewType
-  }
+  // Dummy data for filteredProperties (replace with actual data fetching if needed)
+  const filteredProperties = [
+    { id: 1, email: "example1@example.com", category: "Newsletter Signup", createdTime: "2023-10-01 10:00" },
+    { id: 2, email: "example2@example.com", category: "Magazine", createdTime: "2023-10-02 12:00" },
+  ];
+
+  // Form path for adding new posts
+  const formPath = `/admin/${viewType}/new`;
+
+  // Fetch inquiries
+  useEffect(() => {
+    const fetchInquiries = async () => {
+      try {
+        const response = await fetch("http://localhost:5001/api/inquiries");
+        if (!response.ok) throw new Error("Failed to fetch inquiries");
+        const data = await response.json();
+        setInquiries(data);
+      } catch (error) {
+        console.error("Error fetching inquiries:", error);
+      }
+    };
+
+    fetchInquiries();
+  }, []);
+
+  // Handlers
+  const handleRowClick = (item) => {
+    console.log("Row clicked:", item); // Implement navigation or modal logic
+  };
 
   const handleEditClick = () => {
-    let formPath = "";
-
-    if (viewType === "mansions") {
-      formPath = "/mansionform";
-    } else if (viewType === "penthouses") {
-      formPath = "/penthouseform";
-    } else {
-      return; // Do nothing if the viewType is not "mansions" or "penthouses"
-    }
-
-    navigate(formPath);
+    console.log("Edit clicked"); // Implement edit logic
   };
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentPosts1 = posts.slice(startItem, startItem + itemsPerPage);
+  const handleDelete = (id) => {
+    console.log("Delete clicked for ID:", id); // Implement delete logic
+  };
+
   return (
     <div className="flex-1 bg-[#F9F9F8]">
       <div className="flex bg-[#F9F9F8] pr-4 flex-col sm:flex-row justify-end py-6">
@@ -169,10 +76,9 @@ const Dashboard = ({
       </div>
       <div className="p-6">
         {viewType === "leads" ? (
-          <div className="overflow-x-auto  font-inter">
+          <div className="overflow-x-auto font-inter">
             <div className="flex justify-between items-center mb-2">
               <h2>All Leads</h2>
-
               <div className="flex">
                 <input
                   type="text"
@@ -186,14 +92,14 @@ const Dashboard = ({
                 </button>
               </div>
             </div>
+
             <div className="bg-[#00603A] text-white py-2 px-4 flex justify-between items-center">
               <h2 className="text-base font-inter">Leads</h2>
-
               <div className="flex gap-2">
-                <button className="bg-white text-[#00603A] px-3 py-1  hover:bg-gray-200">
+                <button className="bg-white text-[#00603A] px-3 py-1 hover:bg-gray-200">
                   Import
                 </button>
-                <button className="bg-white text-[#00603A] px-3 py-1  hover:bg-gray-200">
+                <button className="bg-white text-[#00603A] px-3 py-1 hover:bg-gray-200">
                   Export
                 </button>
               </div>
@@ -202,14 +108,12 @@ const Dashboard = ({
             <table className="min-w-full border text-sm font-inter">
               <thead>
                 <tr className="bg-[#BAD4CA]">
-                  <td className="py-2 px-2 border">Reference No</td>
-                  <td className="py-2 px-2 border">Status</td>
-                  <td className="py-2 px-2 border">Listing Reference No</td>
-                  <td className="py-2 px-2 border">First Name</td>
-                  <td className="py-2 px-2 border">Last Name</td>
-                  <td className="py-2 px-2 border">Email</td>
-                  <td className="py-2 px-2 border">Phone</td>
-                  <td className="py-4 px-2  flex">
+                  <th className="py-2 px-2 border">Status</th>
+                  <th className="py-2 px-2 border">First Name</th>
+                  <th className="py-2 px-2 border">Last Name</th>
+                  <th className="py-2 px-2 border">Email</th>
+                  <th className="py-2 px-2 border">Phone</th>
+                  <th className="py-4 px-2 flex">
                     Created Time{" "}
                     <DatePicker
                       selected={selectedDate}
@@ -217,40 +121,44 @@ const Dashboard = ({
                       showTimeSelect
                       dateFormat="Pp"
                       customInput={
-                        <button className=" px-2 py-1  cursor-pointer">
+                        <button className="px-2 py-1 cursor-pointer">
                           {selectedDate ? selectedDate.toLocaleString() : ""} 🔽
                         </button>
                       }
                     />
-                  </td>
-                  <td className="py-2 px-2 border">Listing Status</td>
-                  <td className="py-2 px-2 border">Listing Link</td>
-                  <td className="py-2 px-2 border">Listing Agent</td>
-
-                  <td className="py-2 px-2 border">Message</td>
+                  </th>
+                  <th className="py-2 px-2 border">Message</th>
                 </tr>
               </thead>
               <tbody>
-                {currentPosts.map((post, index) => (
+                {currentPosts.map((inquiry) => (
                   <tr
-                    key={post._id}
-                    className={`hover:bg-gray-100 ${
-                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    }`}
-                    onClick={() => handleRowClick(post)} // Open form/modal on row click
+                    key={inquiry._id}
+                    className={`hover:bg-gray-100`}
+                    onClick={() => handleRowClick(inquiry)}
                   >
-                    <td className="py-2 border text-center">INQ9102</td>
-                    <td className="py-2 px-2 border">NEW</td>
-                    <td className="py-2 px-2 border">TMM920</td>
-                    <td className="py-2 px-2 border">First Name</td>
-                    <td className="py-2 px-2 border">Last Name</td>
-                    <td className="py-2 border text-center">test@email.com</td>
-                    <td className="py-2 px-2 border">971382932</td>
-                    <td className="py-2 px-2 border">16:15PM | 15 Jan 2025</td>
-                    <td className="py-2 px-2 border">Active/Inactive</td>
-                    <td className="py-2 px-2 border">url</td>
-                    <td className="py-2 border text-center">agent</td>
-                    <td className="py-2 px-2 border">Test Custom Message</td>
+                    <td className="py-2 border text-center">{inquiry.reference || "N/A"}</td>
+                    <td className="py-2 px-2 border">{inquiry.firstName || "NEW"}</td>
+                    <td className="py-2 px-2 border">{inquiry.lastName || "N/A"}</td>
+                    <td className="py-2 border text-center">{inquiry.email || "N/A"}</td>
+                    <td className="py-2 px-2 border">{inquiry.phone || "N/A"}</td>
+                    <td className="py-2 px-2 border">
+                      {inquiry.createdAt
+                        ? `${new Date(inquiry.createdAt).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })} | ${new Date(inquiry.createdAt).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}`
+                        : "N/A"}
+                    </td>
+                    <td className="py-2 px-2 border">
+                      <div className="max-w-[200px] truncate" title={inquiry.message}>
+                        {inquiry.message || "N/A"}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -279,20 +187,14 @@ const Dashboard = ({
           </div>
         ) : viewType === "property" ? (
           <div className="overflow-x-auto font-inter">
-            <h1 className="text-2xl mb-4">NewsLetter</h1>
+            <h1 className="text-2xl mb-4">Newsletter</h1>
             <div className="flex flex-col sm:flex-row justify-between items-center mb-5 text-sm">
               <h1 className="flex flex-col text-base">
-                {/* <span>Property List</span> */}
                 <span>
                   Dashboard <span className="text-blue-600">/ {viewType} </span>
                 </span>
               </h1>
               <div className="flex flex-col sm:flex-row gap-3 items-center">
-                {/* <Link to={formPath}>
-                  <button className="bg-[#00603A] text-white text-2xl px-4 text-center pb-1 hover:bg-blue-700">
-                    +
-                  </button>
-                </Link> */}
                 <div className="flex">
                   <input
                     type="text"
@@ -311,7 +213,7 @@ const Dashboard = ({
               <div className="flex bg-[#00603A] text-white py-2 px-4 flex justify-between items-center">
                 <h2 className="text-base font-inter">Property List</h2>
                 <div className="flex gap-2">
-                  <button className="bg-white text-[#00603A] px-3 py-1  hover:bg-gray-200">
+                  <button className="bg-white text-[#00603A] px-3 py-1 hover:bg-gray-200">
                     Export
                   </button>
                 </div>
@@ -322,21 +224,19 @@ const Dashboard = ({
                     <td className="py-2 px-4 border">S.NO</td>
                     <td className="py-2 px-4 border">Email</td>
                     <td className="py-2 px-4 border">
-                      <label className=" px-2">Category</label>
+                      <label className="px-2">Category</label>
                       <select
                         value={filterCategory}
                         onChange={(e) => setFilterCategory(e.target.value)}
-                        className="border  py-2 rounded"
+                        className="border py-2 rounded"
                       >
                         <option value="All">All</option>
                         <option value="Magazine">Magazine</option>
-                        <option value="Newsletter Signup">
-                          Newsletter Signup
-                        </option>
+                        <option value="Newsletter Signup">Newsletter Signup</option>
                       </select>
                     </td>
                     <td className="py-2 px-4 border">
-                      <label className=" px-2">Created Time</label>
+                      <label className="px-2">Created Time</label>
                       <DatePicker
                         selected={selectedDate}
                         onChange={(date) => setSelectedDate(date)}
@@ -344,10 +244,7 @@ const Dashboard = ({
                         dateFormat="Pp"
                         customInput={
                           <button className="border px-2 py-1 rounded bg-white shadow-sm cursor-pointer">
-                            {selectedDate
-                              ? selectedDate.toLocaleString()
-                              : "Select Time"}{" "}
-                            🔽
+                            {selectedDate ? selectedDate.toLocaleString() : "Select Time"} 🔽
                           </button>
                         }
                       />
@@ -358,17 +255,13 @@ const Dashboard = ({
                   {filteredProperties.map((property, index) => (
                     <tr
                       key={property.id}
-                      className={`hover:bg-gray-100 ${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      }`}
+                      className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                       onClick={() => handleRowClick(property)}
                     >
                       <td className="py-2 px-2 border">{property.id}</td>
                       <td className="py-2 px-2 border">{property.email}</td>
                       <td className="py-2 px-2 border">{property.category}</td>
-                      <td className="py-2 px-2 border">
-                        {property.createdTime}
-                      </td>
+                      <td className="py-2 px-2 border">{property.createdTime}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -377,11 +270,9 @@ const Dashboard = ({
           </div>
         ) : (
           <>
-            <h1 className="text-2xl  mb-4">
-              {viewType.toUpperCase().replace("-", " ")}
-            </h1>
+            <h1 className="text-2xl mb-4">{viewType.toUpperCase().replace("-", " ")}</h1>
             <div className="flex flex-col sm:flex-row justify-between items-center mb-5 text-sm">
-              <h1 className="flex flex-col text-base ">
+              <h1 className="flex flex-col text-base">
                 <span>Post List</span>
                 <span>
                   Dashboard <span className="text-blue-600">/ {viewType} </span>
@@ -393,7 +284,6 @@ const Dashboard = ({
                     +
                   </button>
                 </Link>
-
                 <div className="flex">
                   <input
                     type="text"
@@ -408,11 +298,11 @@ const Dashboard = ({
                 </div>
               </div>
             </div>
-            <div className="overflow-x-auto  font-inter">
+            <div className="overflow-x-auto font-inter">
               <div className="bg-[#00603A] text-white py-2 px-4">
                 <h2 className="text-base font-inter">List View</h2>
               </div>
-              <table className="min-w-full border font-inter text-sm  ">
+              <table className="min-w-full border font-inter text-sm">
                 <thead>
                   <tr className="bg-[#BAD4CA]">
                     <td className="py-2 px-4 border">SL.No</td>
@@ -422,11 +312,7 @@ const Dashboard = ({
                       className="py-2 px-4 border cursor-pointer flex items-center gap-1"
                       onClick={() =>
                         setSortOrder(
-                          sortOrder === "asc"
-                            ? "desc"
-                            : sortOrder === "desc"
-                            ? ""
-                            : "asc"
+                          sortOrder === "asc" ? "desc" : sortOrder === "desc" ? "" : "asc"
                         )
                       }
                     >
@@ -442,9 +328,8 @@ const Dashboard = ({
                         </>
                       )}
                     </td>
-
                     <td
-                      className="py-2 px-4 border cursor-pointer  items-center gap-2"
+                      className="py-2 px-4 border cursor-pointer items-center gap-2"
                       onClick={() =>
                         setFilterStatus(
                           filterStatus === "New"
@@ -472,7 +357,6 @@ const Dashboard = ({
                           : "All"}
                       </span>
                     </td>
-
                     <td className="py-2 px-4 border">Action</td>
                   </tr>
                 </thead>
@@ -480,20 +364,12 @@ const Dashboard = ({
                   {currentPosts.map((post, index) => (
                     <tr
                       key={post._id}
-                      className={`hover:bg-gray-100 ${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      }`}
+                      className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                     >
-                      <td className="py-2 px-4 border text-center">
-                        {startItem + index}
-                      </td>
-                      <td className="py-2 px-4 border">{post.name}</td>
-                      <td className="py-2 px-4 border">
-                        {viewType.replace("-", " ")}
-                      </td>
-                      <td className="py-2 px-4 border">
-                        ${post.price} {/* Assuming price is a number */}
-                      </td>
+                      <td className="py-2 px-4 border text-center">{startIndex + index + 1}</td>
+                      <td className="py-2 px-4 border">{post.name || "N/A"}</td>
+                      <td className="py-2 px-4 border">{viewType.replace("-", " ")}</td>
+                      <td className="py-2 px-4 border">${post.price || 0}</td>
                       <td className="py-2 px-4 border">
                         {post.isNew ? (
                           <span className="text-blue-600">New</span>
@@ -503,9 +379,8 @@ const Dashboard = ({
                           <span className="text-red-600">Sold</span>
                         )}
                       </td>
-
-                      <td className="py-2 px-4  flex justify-center gap-2">
-                        <button className="text-blue-600  hover:text-blue-800">
+                      <td className="py-2 px-4 flex justify-center gap-2">
+                        <button className="text-blue-600 hover:text-blue-800">
                           <FaEye />
                         </button>
                         <button
@@ -514,7 +389,6 @@ const Dashboard = ({
                         >
                           <FaEdit />
                         </button>
-
                         <button
                           onClick={() => handleDelete(post._id)}
                           className="text-red-600 hover:text-red-800"

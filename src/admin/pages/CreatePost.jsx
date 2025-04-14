@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import MansionForm from "./MansionForm";
-import PenthouseForm from "./PenthouseForm";
+import PenthouseForm from "../../components/PenthouseForm";
 import MagazineForm from "./MagazineForm";
-import Collectibles from "./Collectibles";
-import HomePageForm from "./HomePageForm";
-import NewDevelopmentForm from "../components/NewDevelopmentform";
+import Collectibles from "../../components/Collectibles";
+import HomePageForm from "../../components/HomePageForm";
+import NewDevelopmentForm from "../../components/NewDevelopmentform";
 function CreatePost() {
   const [category, setCategory] = useState("");
 
